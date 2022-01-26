@@ -11,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.formation.banque.config.ConfigurationPersistance;
+import fr.formation.banque.persistance.ConfigurationPersistance;
 import fr.formation.banque.persistance.dao.ClientDAO;
 import fr.formation.banque.persistance.dao.CompteDAO;
 import fr.formation.banque.persistance.to.Client;
@@ -34,32 +34,32 @@ public class JdbcCompteDAOTest {
 		Client client2 = clientDAO.rechercherClientParId(2);
 		compte.setNumero(456236);
 		compte.setSolde(22000.00);
-		compte.setClient(client2);
+		compte.setIdClient(1);
 		
 		compteDAO.ajouterCompte(compte);
 		
 		Compte compteRecupere = compteDAO.rechercherCompteParNumero(456236);
-		assertEquals(new Double(22000.00), new Double(compteRecupere.getSolde()));
-		assertEquals(2, compte.getClient().getId());
+		assertEquals(22000.00, compteRecupere.getSolde(), 0);
+		assertEquals(1, compte.getIdClient());
 		// ...
 	}
 
 	@Test
 	public void testModifierCompte() {
 		Compte compte = compteDAO.rechercherCompteParNumero(245646786);
-		assertEquals(new Double(8400.00), new Double(compte.getSolde()));
+		assertEquals(8400.00, compte.getSolde(), 0);
 		
 		compte.setSolde(9999.00);
 		compteDAO.modifierCompte(compte);
 		
 		compte = compteDAO.rechercherCompteParNumero(245646786);
-		assertEquals(new Double(9999.00), new Double(compte.getSolde()));
+		assertEquals(9999.00, compte.getSolde(), 0);
 	}
 
 	@Test
 	public void testRechercherCompteParNumero() {
 		Compte compte = compteDAO.rechercherCompteParNumero(245646786);
-		assertEquals(new Double(8400.00), new Double(compte.getSolde()));
+		assertEquals(8400.00, compte.getSolde(), 0);
 	}
 
 	@Test
