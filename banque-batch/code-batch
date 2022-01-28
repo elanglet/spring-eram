@@ -1,0 +1,42 @@
+	@Bean
+	public ItemReader<Client> reader() {
+		JdbcCursorItemReader<Client> itemReader = new JdbcCursorItemReader<Client>();
+		
+		// On précise la DataSource à utiliser poour la connection à la base
+		itemReader.setDataSource(dataSourceBanque);
+
+		itemReader.setSql("SELECT id,nom,prenom,adresse,codepostal,ville,motdepasse FROM client");
+		// On fait l'association entre les colonnes de la table et les attributs de la classe
+		itemReader.setRowMapper(BeanPropertyRowMapper.newInstance(Client.class));
+		
+		return itemReader;
+	}
+	
+	@Bean
+	public ItemProcessor<Client, Client> processor() {
+		return new ClientItemProcessor();
+	}
+	
+	@Bean
+	public ItemWriter<Client> writer() {
+		
+		FlatFileItemWriter<Client> itemWriter = new FlatFileItemWriter<Client>();
+		
+		// On précise le fichier d'entrée
+		itemWriter.setResource(new FileSystemResource("fichierClient.csv"));
+		
+        //All job repetitions should "append" to same output file
+		itemWriter.setAppendAllowed(true);
+         
+		DelimitedLineAggregator<Client> aggregator = new DelimitedLineAggregator<>();
+		aggregator.setDelimiter(";");
+		aggregator.setFieldExtractor(new BeanWrapperFieldExtractor<Client>() {
+            {
+                setNames(new String[] { "id", "nom", "prenom", "adresse", "codePostal", "ville", "motDePasse" });
+            }
+        });
+		
+		itemWriter.setLineAggregator(aggregator);
+		
+		return itemWriter;
+	}
